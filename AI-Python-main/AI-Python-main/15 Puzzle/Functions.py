@@ -1,188 +1,184 @@
 from collections import deque
 
 class MinHeap:
-    def __init__(self, goalstate, compare):
-        self.data = [None]
-        self.size = 0
-        self.comparator = compare
-        self.goalstate = goalstate
+    def __init__(no, estadoObjetivo, compare):
+        no.informacao = [None]
+        no.size = 0
+        no.comparator = compare
+        no.estadoObjetivo = estadoObjetivo
 
-    def __len__(self):
-        return self.size
+    def __len__(no):
+        return no.size
 
-    def __contains__(self, item):
-        return item in self.data
+    def __contains__(no, item):
+        return item in no.informacao
 
-    def __str__(self):
-        return str(self.data)
+    def __str__(no):
+        return str(no.informacao)
 
-    def _compare(self, x, y):
-        x = self.comparator(self.data[x], self.goalstate)
-        y = self.comparator(self.data[y], self.goalstate)
+    def _compare(no, x, y):
+        x = no.comparator(no.informacao[x], no.estadoObjetivo)
+        y = no.comparator(no.informacao[y], no.estadoObjetivo)
 
         if x < y:
             return True
         else:
             return False
 
-    def getpos(self, x):
-        for i in range(self.size+1):
-            if x == self.data[i]:
+    def getpos(no, x):
+        for i in range(no.size+1):
+            if x == no.informacao[i]:
                 return i
         return None
 
-    def _upHeap(self, i):
-        while i > 1 and self._compare(i, int(i/2)):
-            self._swap(i, int(i/2))
+    def _upHeap(no, i):
+        while i > 1 and no._compare(i, int(i/2)):
+            no._swap(i, int(i/2))
             i = int(i/2)
 
-    def _downHeap(self, i):
-        size = self.size
+    def _downHeap(no, i):
+        size = no.size
         while 2*i <= size:
             j = 2*i
-            if j < size and self._compare(j+1, j):
+            if j < size and no._compare(j+1, j):
                 j += 1
-            if self._compare(i, j):
+            if no._compare(i, j):
                 break
-            self._swap(i, j)
+            no._swap(i, j)
             i = j
 
-    def _swap(self, i, j):
-        t = self.data[i]
-        self.data[i] = self.data[j]
-        self.data[j] = t
+    def _swap(no, i, j):
+        t = no.informacao[i]
+        no.informacao[i] = no.informacao[j]
+        no.informacao[j] = t
 
-    def push(self, x):
-        self.size += 1
-        self.data.append(x)
-        self._upHeap(self.size)
+    def push(no, x):
+        no.size += 1
+        no.informacao.append(x)
+        no._upHeap(no.size)
 
-    def pop(self):
-        if self.size < 1:
+    def pop(no):
+        if no.size < 1:
             return None
-        t = self.data[1]
-        self.data[1] = self.data[self.size]
-        self.data[self.size] = t
-        self.size -= 1
-        self._downHeap(1)
-        self.data.pop()
+        t = no.informacao[1]
+        no.informacao[1] = no.informacao[no.size]
+        no.informacao[no.size] = t
+        no.size -= 1
+        no._downHeap(1)
+        no.informacao.pop()
         return t
 
-    def peek(self):
-        if self.size < 1:
+    def peek(no):
+        if no.size < 1:
             return None
-        return self.data[1]
+        return no.informacao[1]
 
 
 # comparadores
-def hamming(inicialState, goalstate):
-    inicial = inicialState.estado
-    goal = goalstate.estado
-    depth = inicialState.profundidade
-    sum = 0
-    for x, y in zip(goal, inicial):
+def hamming(estadoInicial, estadoObjetivo):
+    inicial = estadoInicial.estado
+    objetivo = estadoObjetivo.estado
+    profundidade = estadoInicial.profundidade
+    soma = 0
+    for x, y in zip(objetivo, inicial):
         if x != y and x != '0':
-            sum += 1
-    return sum + depth
+            soma += 1
+    return soma + profundidade
 
-def manhattan(inicialState, goalstate):
-    inicial = inicialState.estado
-    goal = goalstate.estado
-    depth = inicialState.profundidade
-    sum = 0
+def manhattan(estadoInicial, estadoObjetivo):
+    inicial = estadoInicial.estado
+    objetivo = estadoObjetivo.estado
+    profundidade = estadoInicial.profundidade
+    soma = 0
     for i in range(16):
-        if goal[i] == '0':
+        if objetivo[i] == '0':
             continue
         x1, y1 = (int(i / 4), i % 4)
         for j in range(16):
-            if goal[i] == inicial[j]:
+            if objetivo[i] == inicial[j]:
                 x2, y2 = (int(j / 4), j % 4)
-                sum += abs(x1 - x2) + abs(y1 - y2)
+                soma += abs(x1 - x2) + abs(y1 - y2)
                 break
-    return sum + depth
+    return soma + profundidade
 
 #Algoritmos de Pesquisa
 
 # Busca em Largura
-def bfs(inicialState, goalstate):
+def bfs(estadoInicial, estadoObjetivo):
     total_nos = 1
     fronteira = deque()
-    fronteira.append(inicialState)
+    fronteira.append(estadoInicial)
 
     while len(fronteira) > 0:
-        state = fronteira.popleft()
+        estado = fronteira.popleft()
 
-        if goalstate == state:
-            return state.retroceder, total_nos
-        for filho in state.movimentos():
+        if estadoObjetivo == estado:
+            return estado.retroceder, total_nos
+        for filho in estado.movimentos():
             total_nos += 1
             fronteira.append(filho)
-        del(state);
+        del(estado);
     return False, total_nos
 
 # Busca em Profundidade
-def dfs(inicialState, goalstate, depth):
+def dfs(estadoInicial, estadoObjetivo, profundidade):
     total_nos = 1
     fronteira = list()
     visitados = set()
-    fronteira.append(inicialState)
+    fronteira.append(estadoInicial)
 
     while len(fronteira) > 0:
-        state = fronteira.pop()
-        visitados.add(state)
+        estado = fronteira.pop()
+        visitados.add(estado)
 
-        if state == goalstate:
-            return state.retroceder, total_nos
+        if estado == estadoObjetivo:
+            return estado.retroceder, total_nos
 
-        for filho in state.movimentos():
+        for filho in estado.movimentos():
             total_nos += 1
-            if filho.profundidade <= depth:
+            if filho.profundidade <= profundidade:
                 if filho not in visitados or filho not in fronteira:
                     fronteira.append(filho)
-        del(state)
+        del(estado)
     return False, total_nos
 
 # Busca Gulosa
-def guloso(inicialState, goalstate, comparador):
+def guloso(estadoInicial, estadoObjetivo, comparador):
     total_nos = 1
-    print("\nkedia3\n")
-    state = inicialState
-    print("\nkedia4\n")
-    cont = 0
-    while state != goalstate:
-        print("\nkedia %d\n", cont)
-        filhos = state.movimentos()
-        state = filhos.pop()
+    estado = estadoInicial
+    contador = 0
+    while estado != estadoObjetivo:
+        filhos = estado.movimentos()
+        estado = filhos.pop()
         for x in filhos:
             total_nos += 1
-            if comparador(x, goalstate) < comparador(state, goalstate):
-                state = x
-        cont = cont + 1
-    print("\nkedia5\n")
-    return state.retroceder, total_nos
+            if comparador(x, estadoObjetivo) < comparador(estado, estadoObjetivo):
+                estado = x
+        contador = contador + 1
+    return estado.retroceder, total_nos
 
 # Busca A*
-def astar(inicialState, goalstate, comparador):
+def astar(estadoInicial, estadoObjetivo, comparador):
     total_nos = 1
-    fronteira = MinHeap(goalstate, comparador)
-    fronteira.push(inicialState)
+    fronteira = MinHeap(estadoObjetivo, comparador)
+    fronteira.push(estadoInicial)
     visitados = set()
 
     while len(fronteira) > 0:
-        state = fronteira.pop()
-        visitados.add(state)
+        estado = fronteira.pop()
+        visitados.add(estado)
 
-        if goalstate == state:
-            return state.retroceder, total_nos
+        if estadoObjetivo == estado:
+            return estado.retroceder, total_nos
 
-        for filho in state.movimentos():
+        for filho in estado.movimentos():
             total_nos += 1
             if filho not in fronteira and filho not in visitados:
                 fronteira.push(filho)
             elif filho in fronteira:
                 i = fronteira.getpos(filho)
-                if fronteira.data[i].profundidade > filho.profundidade:
-                    fronteira.data[i] = filho
+                if fronteira.informacao[i].profundidade > filho.profundidade:
+                    fronteira.informacao[i] = filho
                     fronteira._upHeap(i)
 
     return False, total_nos

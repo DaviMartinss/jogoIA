@@ -2,12 +2,12 @@ import copy
 
 
 class Tabuleiro:
-    def __init__(no, arg, pai=None, depth=0):
+    def __init__(no, arg, pai=None, profundidade=0):
         no.estado = arg
         no._findx()
         no.filhos = []
         no.retroceder = pai
-        no.profundidade = depth
+        no.profundidade = profundidade
 
 
     def __hash__(no):
@@ -76,7 +76,7 @@ class Tabuleiro:
         if no.y != 0:
             movimento[no.x * 4 + no.y] = movimento[no.x * 4 + no.y - 1]
             movimento[no.x * 4 + no.y - 1] = '0'
-            tleft = Tabuleiro(movimento, pai=caminho, depth=no.profundidade + 1)
+            tleft = Tabuleiro(movimento, pai=caminho, profundidade=no.profundidade + 1)
             no.filhos.append(tleft)
 
     def _right(no):
@@ -89,7 +89,7 @@ class Tabuleiro:
         if no.y != 3:
             movimento[no.x * 4 + no.y] = movimento[no.x * 4 + no.y + 1]
             movimento[no.x * 4 + no.y + 1] = '0'
-            tright = Tabuleiro(movimento, pai=caminho, depth=no.profundidade + 1)
+            tright = Tabuleiro(movimento, pai=caminho, profundidade=no.profundidade + 1)
             no.filhos.append(tright)
 
     def _up(no):
@@ -102,7 +102,7 @@ class Tabuleiro:
         if no.x != 0:
             movimento[no.x * 4 + no.y] = movimento[(no.x - 1) * 4 + no.y]
             movimento[(no.x - 1) * 4 + no.y] = '0'
-            tup = Tabuleiro(movimento, pai=caminho, depth=no.profundidade + 1)
+            tup = Tabuleiro(movimento, pai=caminho, profundidade=no.profundidade + 1)
             no.filhos.append(tup)
 
     def _down(no):
@@ -115,7 +115,7 @@ class Tabuleiro:
         if no.x != 3:
             movimento[no.x * 4 + no.y] = movimento[(no.x + 1) * 4 + no.y]
             movimento[(no.x + 1) * 4 + no.y] = '0'
-            tdown = Tabuleiro(movimento, pai=caminho, depth=no.profundidade + 1)
+            tdown = Tabuleiro(movimento, pai=caminho, profundidade=no.profundidade + 1)
             no.filhos.append(tdown)
 
     def movimentos(no):

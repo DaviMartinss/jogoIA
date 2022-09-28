@@ -6,6 +6,7 @@ from Functions import bfs, dfs, astar, guloso, hamming, manhattan
 
 def main():
     
+    #Argumentos não estão funcionais ainda
     parser = argparse.ArgumentParser(description='Este é um solucionador de 15 quebra-cabeças.')
     parser.add_argument('--dfs', type=int,
                         help='Execute a pesquisa em profundidade (forneça um número inteiro positivo, profundidade máxima para pesquisar)')
@@ -15,50 +16,49 @@ def main():
                         help='Execute a pesquisa A* (1 - hamming; 2 - manhattan)')
     parser.add_argument('--greedy', '--gulosa', type=int, choices=[1, 2],
                         help='Executar busca gananciosa (1 -hamming; 2 -manhattan)')
-
-    parser.add_argument('--input', '-i', help='Specify an input file for tests')
+    
+    parser.add_argument('--input', '-i', help='Especificar um arquivo de entrada para testes')
     args = parser.parse_args()
 
     # Ler tabuleiros
     if args.input is None:
-        inicialState = input("Estado Inicial:\n").split()
-        goalState = input("Estado Objetivo:\n").split()
+        estadoInicial = input("Estado Inicial:\n").split()
+        estadoObjetivo = input("Estado Objetivo:\n").split()
     else:
         try:
-            numbers = []
+            numeros = []
             with open(args.input, "r") as f:
-                lines = f.readlines()
-                for line in lines:
-                    numbers = numbers + line.split()
-            inicialState = numbers[:16]
-            numbers = numbers[16:]
-            goalState = numbers[:16]
+                linhas = f.readlines()
+                for linha in linhas:
+                    numeros = numeros + linha.split()
+            estadoInicial = numeros[:16]
+            numeros = numeros[16:]
+            estadoObjetivo = numeros[:16]
         except FileNotFoundError:
             sys.stderr.write("Caminho de arquivo inválido")
             sys.exit(1)
 
     # iniciar tabuleiros
-    inicialState = Tabuleiro(inicialState)
-    goalState = Tabuleiro(goalState)
+    estadoInicial = Tabuleiro(estadoInicial)
+    estadoObjetivo = Tabuleiro(estadoObjetivo)
     print('Estado Inicial:')
-    print(inicialState)
+    print(estadoInicial)
     print('Estado Objetivo:')
-    print(goalState)
+    print(estadoObjetivo)
 
-    if inicialState == goalState:
+    if estadoInicial == estadoObjetivo:
         print("Ambos são iguais. Já resolvido!")
         sys.exit(0)
 
-    if inicialState.solvabilidade() ^ goalState.solvabilidade():
+    if estadoInicial.solvabilidade() ^ estadoObjetivo.solvabilidade():
         print('Configuração Inválida')
         sys.exit(1)
 
     if args.astar is None and not args.bfs and args.dfs is None and args.greedy is None:
-        sys.stderr.write("Forneça uma entrada válida.")
-
+        
         #Busca em Largura
         print("Pesquisa em largura:")
-        movimento, nodes = bfs(inicialState, goalState)
+        movimento, nodes = bfs(estadoInicial, estadoObjetivo)
         print(nodes, "nós usados")
         if movimento:
             print("Caminho para o objetivo:")
@@ -69,7 +69,7 @@ def main():
 
         #Busca em Profundidade
         print("Pesquisa em profundidade:")
-        movimento, nodes= dfs(inicialState, goalState, 12)
+        movimento, nodes= dfs(estadoInicial, estadoObjetivo, 12)
         print(nodes, "nós usados")
         if movimento:
             print("Caminho para o objetivo:")
@@ -83,7 +83,7 @@ def main():
         comp = manhattan
         if args.astar == 1:
             comp = hamming
-        movimento, nodes = astar(inicialState, goalState, comp)
+        movimento, nodes = astar(estadoInicial, estadoObjetivo, comp)
         print(nodes, "nós usados.")
         if movimento:
             print("Caminho para o objetivo:")
@@ -95,13 +95,14 @@ def main():
         #Busca Gulosa
         print("Busca Gulosa:")
         comp = manhattan
-        print("\nkedia1\n")
+        
         if args.greedy == 1:
             comp = hamming
-        print("\nkedia2\n")
-        movimento, nodes = guloso(inicialState, goalState, comp)
-        print("\nkedia72\n")
+        
+        movimento, nodes = guloso(estadoInicial, estadoObjetivo, comp)
+        
         print(nodes, "nós usados.")
+        
         if movimento:
             print("Caminho para o objetivo:")
             print(" -> ".join(movimento))
@@ -109,8 +110,11 @@ def main():
             print("Nenhuma solução encontrada.")
 
         sys.exit(1)
+    else:
+        sys.stderr.write("Forneça uma entrada válida.") 
+        #sys.exit(0)
 
-    if inicialState == goalState:
+    if estadoInicial == estadoObjetivo:
         print("Ambos são iguais. Já resolvido!")
         sys.exit(0)    
 
